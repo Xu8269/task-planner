@@ -30,6 +30,7 @@ function isOverdue(task: Task) {
 export default function TaskCard({ task, onRefresh }: { task: Task; onRefresh: () => void }) {
   const [loading, setLoading] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const overdue = isOverdue(task);
 
   const handleAction = async (action: "status" | "delete") => {
@@ -44,6 +45,7 @@ export default function TaskCard({ task, onRefresh }: { task: Task; onRefresh: (
       await fetch(`/api/tasks/${task._id}`, { method: "DELETE" });
     }
     setLoading(false);
+    setConfirmDelete(false);
     onRefresh();
   };
 
@@ -104,18 +106,59 @@ export default function TaskCard({ task, onRefresh }: { task: Task; onRefresh: (
             编辑
           </button>
           <button
-            onClick={() => handleAction("delete")}
-            disabled={loading}
+            onClick={() => setConfirmDelete(true)}
             style={{
               padding: "6px 12px", fontSize: 13,
               background: "#fee2e2", color: "#dc2626",
-              border: "none", borderRadius: 4, cursor: loading ? "not-allowed" : "pointer",
+              border: "none", borderRadius: 4, cursor: "pointer",
             }}
           >
             删除
           </button>
         </div>
       </div>
+
+      {confirmDelete && (
+        <div
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
+          }}
+          onClick={() => setConfirmDelete(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: 12, padding: 28, width: 360,
+              boxShadow: "0 4px 24px rgba(0,0,0,0.15)", textAlign: "center",
+            }}
+          >
+            <h3 style={{ margin: "0 0 8px" }}>确认删除</h3>
+            <p style={{ color: "#6b7280", margin: "0 0 20px" }}>确定要删除「{task.title}」吗？此操作不可撤销。</p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                style={{
+                  flex: 1, padding: "10px 0", background: "#f3f4f6", border: "none",
+                  borderRadius: 6, fontSize: 15, cursor: "pointer",
+                }}
+              >
+                取消
+              </button>
+              <button
+                onClick={() => handleAction("delete")}
+                disabled={loading}
+                style={{
+                  flex: 1, padding: "10px 0", background: loading ? "#fca5a5" : "#ef4444", color: "#fff",
+                  border: "none", borderRadius: 6, fontSize: 15, cursor: loading ? "not-allowed" : "pointer",
+                }}
+              >
+                {loading ? "删除中..." : "确认删除"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showEdit && (
         <EditTaskModal task={task} onClose={() => setShowEdit(false)} onRefresh={onRefresh} />
