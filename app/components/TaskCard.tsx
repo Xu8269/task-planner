@@ -18,9 +18,19 @@ const priorityColor: Record<string, string> = { normal: "#6b7280", important: "#
 const nextStatus: Record<string, string> = { todo: "doing", doing: "done", done: "todo" };
 const statusLabel: Record<string, string> = { todo: "开始进行", doing: "标记完成", done: "重置" };
 
+function isOverdue(task: Task) {
+  if (!task.deadline || task.status === "done") return false;
+  const today = new Date();
+  const deadline = new Date(task.deadline);
+  today.setHours(0, 0, 0, 0);
+  deadline.setHours(0, 0, 0, 0);
+  return deadline < today;
+}
+
 export default function TaskCard({ task, onRefresh }: { task: Task; onRefresh: () => void }) {
   const [loading, setLoading] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const overdue = isOverdue(task);
 
   const handleAction = async (action: "status" | "delete") => {
     setLoading(true);
@@ -40,15 +50,24 @@ export default function TaskCard({ task, onRefresh }: { task: Task; onRefresh: (
   return (
     <>
       <div style={{
-        background: "#fff", borderRadius: 8, padding: 16,
+        background: overdue ? "#fef2f2" : "#fff",
+        borderRadius: 8, padding: 16,
         borderLeft: `4px solid ${priorityColor[task.priority]}`,
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        outline: overdue ? "1px solid #fecaca" : "none",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 8 }}>
           <strong>{task.title}</strong>
-          <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 12, background: priorityColor[task.priority], color: "#fff" }}>
-            {priorityLabel[task.priority]}
-          </span>
+          <div style={{ display: "flex", gap: 6 }}>
+            {overdue && (
+              <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 12, background: "#ef4444", color: "#fff" }}>
+                已逾期
+              </span>
+            )}
+            <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 12, background: priorityColor[task.priority], color: "#fff" }}>
+              {priorityLabel[task.priority]}
+            </span>
+          </div>
         </div>
 
         {task.content && (
@@ -57,7 +76,7 @@ export default function TaskCard({ task, onRefresh }: { task: Task; onRefresh: (
           </p>
         )}
 
-        <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 12 }}>
+        <div style={{ fontSize: 12, color: overdue ? "#ef4444" : "#9ca3af", marginBottom: 12 }}>
           {task.deadline && <span>截止: {task.deadline.slice(0, 10)}</span>}
         </div>
 
