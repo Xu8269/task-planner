@@ -1,6 +1,7 @@
 import Link from "next/link";
 import connectDB from "@/app/lib/mongodb";
 import Task from "@/app/lib/Task";
+import FishTank from "@/app/components/FishTank";
 
 export default async function HomePage() {
   await connectDB();
@@ -37,6 +38,8 @@ export default async function HomePage() {
           <Link href="/tasks/new" style={{ color: "#2563eb", marginLeft: 4 }}>创建第一个 →</Link>
         </p>
       )}
+
+      <FishTank />
     </div>
   );
 }
