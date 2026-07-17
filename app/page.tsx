@@ -3,6 +3,7 @@ import connectDB from "@/app/lib/mongodb";
 import Task from "@/app/lib/Task";
 import FishTank from "@/app/components/FishTank";
 import Calendar from "@/app/components/Calendar";
+import ClearDoneButton from "@/app/components/ClearDoneButton";
 
 export default async function HomePage() {
   await connectDB();
@@ -16,9 +17,8 @@ export default async function HomePage() {
 
   const stats = { total, todo, doing, done };
 
-  // Extract unique deadline date strings
   const deadlineDates = [...new Set(
-        tasksWithDeadlines.map((t: { deadline: Date }) => {
+    tasksWithDeadlines.map((t: { deadline: Date }) => {
       const d = new Date(t.deadline);
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     })
@@ -26,13 +26,14 @@ export default async function HomePage() {
 
   return (
     <div style={{ padding: 40, maxWidth: 1024, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 24, marginBottom: 24 }}>仪表盘</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <h1 style={{ fontSize: 24, margin: 0 }}>仪表盘</h1>
+        <ClearDoneButton />
+      </div>
 
       <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-        {/* Left: Calendar */}
         <Calendar deadlineDates={deadlineDates} />
 
-        {/* Right: Stats */}
         <div style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
           {[
             { label: "全部任务", value: stats.total, color: "#3b82f6" },
