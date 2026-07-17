@@ -468,7 +468,7 @@ export default function FishTank() {
       </div>
 
       <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 6 }}>
-        🖱️ 鱼已保存到数据库，切换页面或重启不会消失 · 点击鱼缸喂食 · 长到鱼缸30%停止
+        点击鱼缸喂食
       </p>
     </div>
   );
