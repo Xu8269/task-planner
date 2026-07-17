@@ -1,12 +1,8 @@
-import { revalidatePath } from "next/cache";
 import connectDB from "@/app/lib/mongodb";
 import Task from "@/app/lib/Task";
 import TaskBoard from "@/app/components/TaskBoard";
+
 export const dynamic = "force-dynamic";
-async function refreshTasks() {
-  "use server";
-  revalidatePath("/tasks");
-}
 
 export default async function TasksPage() {
   await connectDB();
@@ -29,5 +25,5 @@ export default async function TasksPage() {
   ]);
   const tasks = JSON.parse(JSON.stringify(taskList));
 
-  return <TaskBoard taskList={tasks} refresh={refreshTasks} />;
+  return <TaskBoard taskList={tasks} />;
 }

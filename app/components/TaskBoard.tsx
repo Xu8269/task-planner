@@ -19,20 +19,29 @@ const statusConfig: Record<string, { label: string; bg: string; darkBg: string }
   done:  { label: "已完成", bg: "#d1fae5", darkBg: "#064e3b" },
 };
 
-export default function TaskBoard({ taskList, refresh }: { taskList: Task[]; refresh: () => void }) {
+export default function TaskBoard({ taskList }: { taskList: Task[] }) {
   const theme = useTheme();
-const isDark = theme.mounted ? theme.isDark : false;
-const colors = theme.mounted ? theme.colors : {
-  bg: "#f9fafb",
-  text: "#374151",
-  textSec: "#6b7280",
-  textMuted: "#9ca3af",
-  border: "#d1d5db",
-  card: "#ffffff",
-  header: "#ffffff",
-  inputBg: "#ffffff",
-};
+  const isDark = theme.mounted ? theme.isDark : false;
+  const colors = theme.mounted ? theme.colors : {
+    bg: "#f9fafb",
+    text: "#374151",
+    textSec: "#6b7280",
+    textMuted: "#9ca3af",
+    border: "#d1d5db",
+    card: "#ffffff",
+    header: "#ffffff",
+    inputBg: "#ffffff",
+  };
   const columns = ["todo", "doing", "done"] as const;
+
+  const refresh = async () => {
+    await fetch("/api/revalidate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: "/tasks" }),
+    });
+    window.location.reload();
+  };
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, padding: 24, background: colors.bg }}>
